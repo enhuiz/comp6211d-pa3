@@ -41,12 +41,16 @@ def conv(in_channels, out_channels, kernel_size, stride=2, padding=1, batch_norm
 
 
 class DCGenerator(nn.Module):
-    def __init__(self):
+    def __init__(self, noise_size, conv_dim):
         super(DCGenerator, self).__init__()
 
         ###########################################
         ##   FILL THIS IN: CREATE ARCHITECTURE   ##
         ###########################################
+        self.deconv1 = deconv(noise_size, conv_dim * 4, 4, 2, 0)
+        self.deconv2 = deconv(conv_dim * 4, conv_dim * 2, 4, 2, 1)
+        self.deconv3 = deconv(conv_dim * 2, conv_dim, 4, 2, 1)
+        self.deconv4 = deconv(conv_dim, 3, 4, 2, 1)
 
 
     def forward(self, z):
@@ -82,7 +86,7 @@ class CycleGenerator(nn.Module):
     """Defines the architecture of the generator network.
        Note: Both generators G_XtoY and G_YtoX have the same architecture in this assignment.
     """
-    def __init__(self):
+    def __init__(self, conv_dim, init_zero_weights):
         super(CycleGenerator, self).__init__()
 
         ###########################################
@@ -90,10 +94,17 @@ class CycleGenerator(nn.Module):
         ###########################################
 
         # 1. Define the encoder part of the generator (that extracts features from the input image)
+        self.conv1 = conv(3, conv_dim // 2, 4,
+                          init_zero_weights=init_zero_weights)
+        self.conv2 = conv(conv_dim // 2, conv_dim, 4,
+                          init_zero_weights=init_zero_weights)
 
         # 2. Define the transformation part of the generator
-        
+        self.resnet_block = ResnetBlock(conv_dim)
+
         # 3. Define the decoder part of the generator (that builds up the output image from features)
+        self.deconv1 = deconv(conv_dim, conv_dim // 2, 4)
+        self.deconv2 = deconv(conv_dim // 2, 3, 4)
 
 
     def forward(self, x):
@@ -123,12 +134,17 @@ class DCDiscriminator(nn.Module):
     """Defines the architecture of the discriminator network.
        Note: Both discriminators D_X and D_Y have the same architecture in this assignment.
     """
-    def __init__(self):
+    def __init__(self, conv_dim):
         super(DCDiscriminator, self).__init__()
 
         ###########################################
         ##   FILL THIS IN: CREATE ARCHITECTURE   ##
         ###########################################
+
+        self.conv1 = conv(3, conv_dim, 4, 2, 1)
+        self.conv2 = conv(conv_dim, conv_dim * 2, 4, 2, 1)
+        self.conv3 = conv(conv_dim * 2, conv_dim * 4, 4, 2, 1)
+        self.conv4 = conv(conv_dim * 4, 1, 4, 1, 0)
 
     def forward(self, x):
 
@@ -139,4 +155,3 @@ class DCDiscriminator(nn.Module):
         out = self.conv4(out).squeeze()
         out = F.sigmoid(out)
         return out
-
