@@ -97,8 +97,8 @@ def training_loop(dataloader_X, dataloader_Y, test_dataloader_X, test_dataloader
         # Train with real images
 
         # 1. Compute the discriminator losses on real images
-        D_X_loss = mse_loss(D_X(images_X), torch.ones(opts.batch_size, device=device))
-        D_Y_loss = mse_loss(D_Y(images_Y), torch.ones(opts.batch_size, device=device)) 
+        D_X_loss = mse_loss(D_X(images_X), torch.ones(opts.batch_size).to(device))
+        D_Y_loss = mse_loss(D_Y(images_Y), torch.ones(opts.batch_size).to(device)) 
 
         d_real_loss = D_X_loss + D_Y_loss
         d_real_loss.backward()
@@ -111,13 +111,13 @@ def training_loop(dataloader_X, dataloader_Y, test_dataloader_X, test_dataloader
         fake_X = G_YtoX(images_Y)
 
         # 3. Compute the loss for D_X
-        D_X_loss = mse_loss(D_X(fake_X), torch.zeros(opts.batch_size, device=device))
+        D_X_loss = mse_loss(D_X(fake_X), torch.zeros(opts.batch_size).to(device))
 
         # 4. Generate fake images that look like domain Y based on real images in domain X
         fake_Y = G_XtoY(images_X)
 
         # 5. Compute the loss for D_Y
-        D_Y_loss = mse_loss(D_Y(fake_Y), torch.zeros(opts.batch_size, device=device))
+        D_Y_loss = mse_loss(D_Y(fake_Y), torch.zeros(opts.batch_size).to(device))
 
         d_fake_loss = D_X_loss + D_Y_loss
         d_fake_loss.backward()
@@ -139,7 +139,7 @@ def training_loop(dataloader_X, dataloader_Y, test_dataloader_X, test_dataloader
         fake_X = G_YtoX(images_Y)
 
         # 2. Compute the generator loss based on domain X
-        g_loss = mse_loss(D_X(fake_X), torch.ones(opts.batch_size, device=device)) 
+        g_loss = mse_loss(D_X(fake_X), torch.ones(opts.batch_size).to(device)) 
 
         # 3. Compute the cycle consistency loss (the reconstruction loss)
         cycle_consistency_loss = mse_loss(G_XtoY(fake_X), images_Y) 
@@ -159,7 +159,7 @@ def training_loop(dataloader_X, dataloader_Y, test_dataloader_X, test_dataloader
         fake_Y = G_XtoY(images_X)
 
         # 2. Compute the generator loss based on domain Y
-        g_loss = mse_loss(D_Y(fake_Y), torch.ones(opts.batch_size, device=device))
+        g_loss = mse_loss(D_Y(fake_Y), torch.ones(opts.batch_size).to(device))
 
         # 3. Compute the cycle consistency loss (the reconstruction loss)
         cycle_consistency_loss = mse_loss(G_YtoX(fake_Y), images_X)
