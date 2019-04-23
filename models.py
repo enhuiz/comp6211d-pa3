@@ -50,7 +50,7 @@ class DCGenerator(nn.Module):
         self.deconv1 = deconv(noise_size, conv_dim * 4, 4, 2, 0)
         self.deconv2 = deconv(conv_dim * 4, conv_dim * 2, 4, 2, 1)
         self.deconv3 = deconv(conv_dim * 2, conv_dim, 4, 2, 1)
-        self.deconv4 = deconv(conv_dim, 3, 4, 2, 1)
+        self.deconv4 = deconv(conv_dim, 3, 4, 2, 1, batch_norm=False)
 
 
     def forward(self, z):
@@ -104,7 +104,7 @@ class CycleGenerator(nn.Module):
 
         # 3. Define the decoder part of the generator (that builds up the output image from features)
         self.deconv1 = deconv(conv_dim, conv_dim // 2, 4)
-        self.deconv2 = deconv(conv_dim // 2, 3, 4)
+        self.deconv2 = deconv(conv_dim // 2, 3, 4, batch_norm=False)
 
 
     def forward(self, x):
@@ -144,7 +144,7 @@ class DCDiscriminator(nn.Module):
         self.conv1 = conv(3, conv_dim, 4, 2, 1)
         self.conv2 = conv(conv_dim, conv_dim * 2, 4, 2, 1)
         self.conv3 = conv(conv_dim * 2, conv_dim * 4, 4, 2, 1)
-        self.conv4 = conv(conv_dim * 4, 1, 4, 1, 0)
+        self.conv4 = conv(conv_dim * 4, 1, 4, 1, 0, batch_norm=False)
 
     def forward(self, x):
 

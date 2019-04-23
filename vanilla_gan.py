@@ -96,7 +96,7 @@ def train(train_loader, opts, device):
             fake_images = G(noise)
             
             # 3. Compute the generator loss
-            G_loss = mse_loss(D(fake_images), torch.zeros(opts.batch_size).to(device))
+            G_loss = mse_loss(D(fake_images), torch.ones(opts.batch_size).to(device))
 
             G_loss.backward()
             g_optimizer.step()
