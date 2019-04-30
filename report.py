@@ -3,13 +3,19 @@ import re
 import glob
 import pandas as pd
 import matplotlib.pyplot as plt
+# plt.style.use('ggplot')
 
 
-for path in glob.glob('log/*.out'):
+def read(path):
     with open(path, 'r') as f:
-        content = f.read()
-    rows = []
+        return f.read()
+
+
+def plot_loss(path):
+    content = read(path)
     lines = content.split('\n')
+
+    rows = []
     for line in lines:
         if 'Iteration' in line:
             items = [s.strip() for s in line.split('|')]
@@ -20,5 +26,13 @@ for path in glob.glob('log/*.out'):
             rows.append(loss_dict)
     df = pd.DataFrame(rows)
     df = df.set_index('iteration')
-    df.plot(title=path)
-    plt.show()
+    df.plot(figsize=(10, 5))
+    plt.legend(loc='upper right')
+    img_path = 'report/fig/{}.png'.format(path.split('/')[-1].strip('.out'))
+    plt.savefig(img_path)
+    return '![title]({})'.format(img_path)
+
+
+for path in glob.glob('log/*.out'):
+    md = plot_loss(path)
+    print(md)
